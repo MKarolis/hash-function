@@ -1,4 +1,6 @@
 package com.karolismed.hashfunction.hashing;
 
-public class HashGenerator {
+class HashGenerator {
+    void processBucket(boolean[] bucket) {
+    }
 }
