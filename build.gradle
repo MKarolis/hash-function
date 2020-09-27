@@ -31,4 +31,5 @@ jar {
 launch4j {
     mainClassName = 'com.karolismed.hashfunction.Main'
     headerType = 'console'
+    jreMinVersion = '11'
 }
