@@ -9,7 +9,7 @@ public class Main {
         FileUtils fileUtils = new FileUtils();
         HashingService hashingService = new HashingService();
 
-        String data = fileUtils.readStringFromClasspath("input.txt");
-        System.out.println(hashingService.hash(data));
+//        String data = fileUtils.readStringFromClasspath("HGBIG.txt");
+        System.out.println(hashingService.hash("123456789012345678901234567890123456789012345678901234567890abcdefgh"));
     }
 }
