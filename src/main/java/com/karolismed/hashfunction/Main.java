@@ -13,11 +13,13 @@ public class Main {
         HashingService hashingService = new HashingService();
         BenchMarkService benchMarkService = new BenchMarkService();
 
-        try {
-            fileUtils.generateTestDataPairsDiffInOneSymbol("100k_pairs_diffOneSymbol.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            fileUtils.generateTestDataPairsDiffInOneSymbol("100k_pairs_diffOneSymbol.txt");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        benchMarkService.benchmarkHashFunction();
 
     }
 }
