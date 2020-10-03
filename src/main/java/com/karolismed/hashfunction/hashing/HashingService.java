@@ -1,7 +1,6 @@
 package com.karolismed.hashfunction.hashing;
 
 import java.nio.charset.StandardCharsets;
-import java.util.BitSet;
 
 public class HashingService {
     static final int BUCKET_SIZE = 64; // bytes
@@ -19,19 +18,17 @@ public class HashingService {
             0b01010001010001110010000101010110,
             0b11101111001011011010110110011011
     };
+
     public String hash(String input) {
         HashGenerator generator = new HashGenerator(HASH_SEED);
 
         byte[] inputBytes =  input.getBytes(StandardCharsets.UTF_8);
         int bucketCount = (int)Math.ceil(inputBytes.length / (double) FREE_BUCKET_SIZE);
 
-        String binaryInput = strToBinary(input);
-
         int bucketIndex = 0;
         do {
             generator.processBucket(inputBytes, FREE_BUCKET_SIZE * bucketIndex);
-            bucketIndex++;
-        } while (bucketIndex < bucketCount);
+        } while (++bucketIndex < bucketCount);
 
         return generator.formatHash();
     }
