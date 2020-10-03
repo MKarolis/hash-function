@@ -4,7 +4,7 @@ import static com.karolismed.hashfunction.hashing.HashingService.FREE_BUCKET_SIZ
 
 class HashGenerator {
 
-    private static final int WORDS_PER_BUCKET = 64;
+    private static final int WORDS_PER_BUCKET = 64; //
     private static final int WORD_GENERATION_LOWER_BOUND = 16;
 
     private int[] hashWords;
@@ -28,7 +28,7 @@ class HashGenerator {
             stringBuilder.append(String.format("%08x", word));
         }
 
-        return  stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     private void addWordsFromExistingBytes(byte[] bytes, int[] words, int startIndex) {
@@ -46,6 +46,49 @@ class HashGenerator {
         }
 
         words[WORD_GENERATION_LOWER_BOUND - 1] = bytes.length;
+    }
+
+    // 1010 1010 1010 1010 1010 1010 1010 1010
+
+    private int op1(int word) {
+        return Integer.rotateLeft(word, 8)
+            ^ Integer.rotateRight(word, 16)
+            ^ (word >>> 12);
+    }
+
+    private int op2(int word) {
+        return word
+            ^ Integer.rotateLeft(word, 6)
+            ^ Integer.rotateRight(word, 9)
+            ^ (word << 15);
+    }
+
+    private int op3(int word) {
+        return word
+            ^ (Integer.rotateRight(word, 21))
+            ^ (word << 7);
+    }
+
+    private int op4(int word) {
+        return word
+            ^ ~(word << 12)
+            ^ ~(word >>> 12);
+    }
+
+    private int op5(int word) {
+        return Integer.rotateRight(word, 8)
+            ^ (word << 12)
+            ^ (word >>> 16);
+    }
+    private int op6(int word) {
+        return (word << 27)
+            | (word >>> 27)
+            ^ (word >>> 18)
+            ^ (word << 18);
+    }
+
+    private int invertWord(int word) {
+        return ~word;
     }
 
     // Helper fns
