@@ -24,12 +24,13 @@ class HashGenerator {
         addWordsFromExistingBytes(bytes, words, startIndex);
         generateAdditionalWords(words);
 
+        mutateHashWords(words);
     }
 
     public String formatHash() {
         StringBuilder stringBuilder = new StringBuilder();
         for (int word : hashWords) {
-            stringBuilder.append(String.format("%08x", word));
+            stringBuilder.append(String.format("%08X", word));
         }
 //        return wordsToBinary(Arrays.copyOfRange(words, WORD_GENERATION_LOWER_BOUND + 16, WORDS_PER_BUCKET));
         return stringBuilder.toString();
@@ -65,7 +66,30 @@ class HashGenerator {
         }
     }
 
-    // 1010 1010 1010 1010 1010 1010 1010 1010
+    private void mutateHashWords(int[] words) {
+        for (int word : words) {
+            // hashWords[hashWordIndex] = mutations on hashWordIndex + 1, + 3, + 6;
+            int hw1 = hashWords[(hashWordIndex + 1) % hashWords.length];
+            int hw2 = hashWords[(hashWordIndex + 3) % hashWords.length];
+            int hw3 = hashWords[(hashWordIndex + 6) % hashWords.length];
+
+            int temp1 = op1(hw1)
+                ^ ((~op5(hw2)) & (op2(word)))
+                ^ op3(word);
+            int temp2 = op5(hw2) ^ op2(
+                op4(hw3) & (~op3(word))
+            ) ^ op6(word);
+            int temp3 = (op4(hw1) & op2(word))
+                ^ op5(word)
+                ^ op1(hw3);
+
+            hashWords[hashWordIndex] = op1(temp1 ^ temp2) ^ op5(temp3 ^ op1(temp2));
+
+            if (++hashWordIndex == hashWords.length) {
+                hashWordIndex = 0;
+            }
+        }
+    }
 
     private int op1(int word) {
         return Integer.rotateLeft(word, 8)
