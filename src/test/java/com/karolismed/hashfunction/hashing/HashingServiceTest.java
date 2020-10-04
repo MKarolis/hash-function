@@ -3,7 +3,7 @@ package com.karolismed.hashfunction.hashing;
 import static com.karolismed.hashfunction.hashing.HashingService.HASH_LENGTH;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.karolismed.hashfunction.hashing.constants.TestResourceFilename;
+import com.karolismed.hashfunction.constants.TestResourceFilename;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Before;

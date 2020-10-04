@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.beust:jcommander:1.71"
+    compile "com.beust:jcommander:1.78"
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
     compile group: 'commons-io', name: 'commons-io', version: '2.8.0'

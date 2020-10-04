@@ -4,10 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 public class HashingService {
     public static final int HASH_LENGTH = 64;
-    static final int BUCKET_SIZE = 64; // bytes
-    static final int FREE_BUCKET_SIZE = 60; // bytes
-
-    static final int BYTES_PER_BUCKET = BUCKET_SIZE / Byte.SIZE; // 64
+    static final int FREE_BUCKET_SIZE = 60;
 
     static final int[] HASH_SEED = {
             0b11000011011111010011011000110000,

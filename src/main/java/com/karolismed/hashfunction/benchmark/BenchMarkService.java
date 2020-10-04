@@ -3,7 +3,6 @@ package com.karolismed.hashfunction.benchmark;
 import com.karolismed.hashfunction.constants.ResourceFilename;
 import com.karolismed.hashfunction.hashing.HashingService;
 import com.karolismed.hashfunction.utils.StringHelper;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,7 +12,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -40,11 +38,16 @@ public class BenchMarkService {
     }
 
     public void benchmarkAgainstHash(String hashName) {
-        System.out.println("Benchmarking " + hashName + " against custom hash");
-        DigestUtils otherHash = new DigestUtils(hashName);
+        try {
+            DigestUtils otherHash = new DigestUtils(hashName);
 
-        testAgainstHashPerformance(otherHash);
-        testAgainstHashDiff(otherHash);
+            System.out.println("Benchmarking " + hashName + " against custom hash");
+
+            testAgainstHashPerformance(otherHash);
+            testAgainstHashDiff(otherHash);
+        } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: Invalid algorithm specified");
+        }
     }
 
     private void testAgainstHashPerformance(DigestUtils hash) {

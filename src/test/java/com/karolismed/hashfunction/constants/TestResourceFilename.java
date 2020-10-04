@@ -1,4 +1,4 @@
-package com.karolismed.hashfunction.hashing.constants;
+package com.karolismed.hashfunction.constants;
 
 public enum TestResourceFilename {
     ONE_SYMBOL_1("oneSymbol_1.txt"),
