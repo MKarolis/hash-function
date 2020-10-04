@@ -2,7 +2,8 @@ package com.karolismed.hashfunction.constants;
 
 public enum ResourceFilename {
     PAIRS_100K("100k_pairs.txt"),
-    PAIRS_100K_DIFF_ONE_SYMBOL("100k_pairs_diffOneSymbol.txt");
+    PAIRS_100K_DIFF_ONE_SYMBOL("100k_pairs_diffOneSymbol.txt"),
+    CONSTITUTION("konstitucija.txt");
 
     private String fileName;
 

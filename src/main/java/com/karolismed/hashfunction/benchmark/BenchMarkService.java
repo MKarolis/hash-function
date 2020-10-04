@@ -1,23 +1,39 @@
 package com.karolismed.hashfunction.benchmark;
 
 import com.karolismed.hashfunction.constants.ResourceFilename;
+import com.karolismed.hashfunction.hashing.HashingService;
 import com.karolismed.hashfunction.utils.FileUtils;
 import com.karolismed.hashfunction.utils.StringHelper;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class BenchMarkService {
 
     private FileUtils fileUtils;
+    private HashingService hashingService;
 
     public BenchMarkService() {
         fileUtils = new FileUtils();
+        hashingService = new HashingService();
     }
 
     public void benchmarkHashFunction() {
         prepareBenchmarkData();
+
+        benchmarkConstitutionHash();
 
         cleanupTestData();
     }
@@ -46,7 +62,6 @@ public class BenchMarkService {
 
         } catch (IOException e) {
             System.out.println("ERROR: Benchmark file preparation failed, " + e.getMessage());
-            System.exit(1);
         }
     }
 
@@ -66,6 +81,38 @@ public class BenchMarkService {
                 "%s %s", str, StringHelper.incrementCharInString(str, i % length))
             );
         }
+    }
+
+    private void benchmarkConstitutionHash() {
+        StopWatch stopWatch = new StopWatch();
+        System.out.println(
+            String.format("Starting benchmarking of file %s...", ResourceFilename.CONSTITUTION)
+        );
+
+        try {
+            InputStream inputStream =
+                ClassLoader.getSystemResourceAsStream(ResourceFilename.CONSTITUTION.toString());
+
+            List<String> inputLines = IOUtils.readLines(
+                Objects.requireNonNull(inputStream),
+                StandardCharsets.UTF_8
+            );
+
+            stopWatch.start();;
+            inputLines.forEach(hashingService::hash);
+            stopWatch.stop();
+        } catch (IOException e) {
+            System.out.println(
+                String.format(
+                    "ERROR: benchmarking of file %s failed, %s",
+                    ResourceFilename.CONSTITUTION,
+                    e.getMessage()
+                )
+            );
+            return;
+        }
+
+        System.out.println(String.format("Hashing took %sms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
     }
 
     private void cleanupTestData() {
