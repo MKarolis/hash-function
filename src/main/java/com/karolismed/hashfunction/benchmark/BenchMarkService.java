@@ -2,7 +2,6 @@ package com.karolismed.hashfunction.benchmark;
 
 import com.karolismed.hashfunction.constants.ResourceFilename;
 import com.karolismed.hashfunction.hashing.HashingService;
-import com.karolismed.hashfunction.utils.FileUtils;
 import com.karolismed.hashfunction.utils.StringHelper;
 
 import java.io.BufferedReader;
@@ -14,6 +13,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -21,11 +22,9 @@ import static java.util.Objects.requireNonNull;
 
 public class BenchMarkService {
 
-    private FileUtils fileUtils;
     private HashingService hashingService;
 
     public BenchMarkService() {
-        fileUtils = new FileUtils();
         hashingService = new HashingService();
     }
 
@@ -35,8 +34,75 @@ public class BenchMarkService {
 
         benchmarkConstitutionHash();
         benchmarkCollisions();
+        benchmarkDifference();
 
         cleanupTestData();
+    }
+
+    public void benchmarkAgainstHash(String hashName) {
+        System.out.println("Benchmarking " + hashName + " against custom hash");
+        DigestUtils otherHash = new DigestUtils(hashName);
+
+        testAgainstHashPerformance(otherHash);
+        testAgainstHashDiff(otherHash);
+    }
+
+    private void testAgainstHashPerformance(DigestUtils hash) {
+        int hashCount = 1_000_000;
+        StopWatch stopWatch = new StopWatch();
+        System.out.println("Benchmarking hash performance for 1 000 000 digests...");
+
+        stopWatch.start();
+        for (int i = 0; i < hashCount; i++) {
+            hash.digestAsHex(Integer.toBinaryString(i).repeat(4));
+        }
+        stopWatch.stop();
+        long otherHashTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+
+        stopWatch.reset();
+        stopWatch.start();
+        for (int i = 0; i < hashCount; i++) {
+            hashingService.hash(Integer.toBinaryString(i).repeat(4));
+        }
+        stopWatch.stop();
+
+        System.out.println("Performance results: ");
+        System.out.printf(
+            "%s: %.2fs CustomHash: %.2fs",
+            hash.getMessageDigest().getAlgorithm(),
+            otherHashTime / 1000.0,
+            stopWatch.getTime(TimeUnit.MILLISECONDS) / 1000.0
+        );
+        System.out.println();
+        System.out.println();
+    }
+
+    private void testAgainstHashDiff(DigestUtils hash) {
+        int hashCount = 100_000;
+        int inputLength = 100;
+        System.out.println("Benchmarking hash diff for 100 000 digests...");
+
+        double otherHashDiffSum = 0.00;
+        double customHashDiffSum = 0.00;
+
+        for (int i = 0; i < hashCount; i++) {
+            String originalStr = StringHelper.generateString(inputLength);
+            String alteredStr = StringHelper.incrementCharInString(originalStr, i % inputLength);
+
+            otherHashDiffSum +=
+                stringDiffPercentage(hash.digestAsHex(originalStr), hash.digestAsHex(alteredStr));
+            customHashDiffSum +=
+                stringDiffPercentage(hashingService.hash(originalStr), hashingService.hash(alteredStr));
+        }
+
+        System.out.println("Diff benchmarking finished");
+        System.out.println("Average diff per character:");
+        System.out.printf(
+            "%s: %.2f%%  CustomHash: %.2f%%",
+            hash.getMessageDigest().getAlgorithm(),
+            otherHashDiffSum/(double)hashCount,
+            customHashDiffSum/(double)hashCount
+        );
     }
 
     private void prepareBenchmarkData() {
@@ -114,6 +180,7 @@ public class BenchMarkService {
         }
 
         System.out.println(String.format("Hashing took %sms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
+        System.out.println();
     }
 
     private void benchmarkCollisions() {
@@ -141,6 +208,63 @@ public class BenchMarkService {
         }
 
         System.out.println(String.format("Found %s collision among 100 000 pairs", collisions));
+        System.out.println();
+    }
+
+    private void benchmarkDifference() {
+        System.out.println("Benchmarking diff between similar 100 000 String pairs...");
+
+        double minCharDiff = 100.00;
+        double maxCharDiff = 0.00;
+        double minBitDiff = 100.00;
+        double maxBitDiff = 0.00;
+
+        double charDiffSum = 0.00;
+        double bitDiffSum = 0.00;
+        int processed = 0;
+
+        try (BufferedReader reader = new BufferedReader(
+            new FileReader(ResourceFilename.PAIRS_100K_DIFF_ONE_SYMBOL.toString()))
+        ) {
+            for (String line; (line = reader.readLine()) != null; ) {
+                String first = hashingService.hash(line.split(" ")[0]);
+                String second = hashingService.hash(line.split(" ")[1]);
+
+                double charDiff = stringDiffPercentage(first, second);
+                double bitDiff = binaryDiffPercentage(first, second);
+
+                minCharDiff = Math.min(minCharDiff, charDiff);
+                maxCharDiff = Math.max(maxCharDiff, charDiff);
+                minBitDiff = Math.min(minBitDiff, bitDiff);
+                maxBitDiff = Math.max(maxBitDiff, bitDiff);
+
+                charDiffSum += charDiff;
+                bitDiffSum += bitDiff;
+                processed++;
+            }
+        } catch (IOException e) {
+            System.out.println(
+                String.format(
+                    "ERROR: benchmarking of file %s failed, %s",
+                    ResourceFilename.PAIRS_100K,
+                    e.getMessage()
+                )
+            );
+            return;
+        }
+
+        System.out.println("Diff benchmarking finished, results:");
+        System.out.println("Difference per character: ");
+        System.out.printf(
+            "MIN: %.2f%% MAX: %.2f%% AVG: %.2f%% %s",
+            minCharDiff, maxCharDiff, charDiffSum/(double)processed, System.lineSeparator()
+        );
+        System.out.println("Difference per bit: ");
+        System.out.printf(
+            "MIN: %.2f%% MAX: %.2f%% AVG: %.2f%% %s",
+            minBitDiff, maxBitDiff, bitDiffSum/(double)processed, System.lineSeparator()
+        );
+        System.out.println();
     }
 
     private void cleanupTestData() {
