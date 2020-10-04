@@ -4,21 +4,20 @@ import com.karolismed.hashfunction.constants.ResourceFilename;
 import com.karolismed.hashfunction.hashing.HashingService;
 import com.karolismed.hashfunction.utils.FileUtils;
 import com.karolismed.hashfunction.utils.StringHelper;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.StopWatch;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.StopWatch;
+
+import static java.util.Objects.requireNonNull;
 
 public class BenchMarkService {
 
@@ -31,9 +30,11 @@ public class BenchMarkService {
     }
 
     public void benchmarkHashFunction() {
+        System.out.println("Preparing benchmarking input data...");
         prepareBenchmarkData();
 
         benchmarkConstitutionHash();
+        benchmarkCollisions();
 
         cleanupTestData();
     }
@@ -94,7 +95,7 @@ public class BenchMarkService {
                 ClassLoader.getSystemResourceAsStream(ResourceFilename.CONSTITUTION.toString());
 
             List<String> inputLines = IOUtils.readLines(
-                Objects.requireNonNull(inputStream),
+                requireNonNull(inputStream),
                 StandardCharsets.UTF_8
             );
 
@@ -115,9 +116,41 @@ public class BenchMarkService {
         System.out.println(String.format("Hashing took %sms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
     }
 
+    private void benchmarkCollisions() {
+        System.out.println("Looking for collisions among 100 000 String pairs...");
+        int collisions = 0;
+
+        try (BufferedReader reader = new BufferedReader(
+            new FileReader(ResourceFilename.PAIRS_100K.toString()))
+        ) {
+            for (String line; (line = reader.readLine()) != null; ) {
+                if (hashingService.hash(line.split(" ")[0])
+                    .equals(hashingService.hash(line.split(" ")[1]))) {
+                    collisions++;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(
+                String.format(
+                    "ERROR: benchmarking of file %s failed, %s",
+                    ResourceFilename.PAIRS_100K,
+                    e.getMessage()
+                )
+            );
+            return;
+        }
+
+        System.out.println(String.format("Found %s collision among 100 000 pairs", collisions));
+    }
+
     private void cleanupTestData() {
         File file;
-        for (ResourceFilename filename : ResourceFilename.values()) {
+        ResourceFilename[] resourcesToClean = {
+            ResourceFilename.PAIRS_100K_DIFF_ONE_SYMBOL,
+            ResourceFilename.PAIRS_100K
+        };
+
+        for (ResourceFilename filename : resourcesToClean) {
             file = new File(filename.toString());
             if(!file.delete()) {
                 System.out.println("WARNING: Failed to delete test file " + filename);
