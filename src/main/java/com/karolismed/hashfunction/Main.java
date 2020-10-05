@@ -34,18 +34,23 @@ public class Main {
         switch (clParams.getOperationMode()) {
             case CL_ARG: {
                 System.out.println(hashingService.hash(clParams.getValue()));
+                break;
             }
             case BENCHMARK: {
                 benchMarkService.benchmarkHashFunction();
+                break;
             }
             case VERSUS: {
                 benchMarkService.benchmarkAgainstHash(clParams.getValue());
+                break;
             }
             case INTERACTIVE: {
                 ioService.hashInputFromConsole();
+                break;
             }
             case FILE_ARG: {
                 ioService.hashInputFromFile(clParams.getValue());
+                break;
             }
         }
     }
