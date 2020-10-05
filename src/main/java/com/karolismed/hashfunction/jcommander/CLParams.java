@@ -1,7 +1,7 @@
 package com.karolismed.hashfunction.jcommander;
 
 import com.beust.jcommander.Parameter;
-import com.karolismed.hashfunction.benchmark.OperationMode;
+import com.karolismed.hashfunction.constants.OperationMode;
 import com.karolismed.hashfunction.jcommander.converter.OperationModeConverter;
 
 public class CLParams {

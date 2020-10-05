@@ -1,4 +1,4 @@
-package com.karolismed.hashfunction.benchmark;
+package com.karolismed.hashfunction.constants;
 
 public enum OperationMode {
     CL_ARG("ARG"),

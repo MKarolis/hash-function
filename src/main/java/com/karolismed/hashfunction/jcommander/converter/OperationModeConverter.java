@@ -2,7 +2,7 @@ package com.karolismed.hashfunction.jcommander.converter;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
-import com.karolismed.hashfunction.benchmark.OperationMode;
+import com.karolismed.hashfunction.constants.OperationMode;
 
 import java.util.Optional;
 
