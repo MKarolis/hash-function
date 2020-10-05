@@ -95,6 +95,36 @@ $ ./HashFunction.exe -m file file.txt
 28A5FE015D9993FE92F861CBC39D5B8838EEDFB2754323F14BCABE3551FFD4C7
 ```
 
+Hashing Performance
+-------------------
+Hashing quality and performance analysis (in benchmark mode):
+- Time to hash constitution of Republic of Lithuania - **48ms**
+- Number of collisions among 100 000 pairs of words - **0**
+- Diff results among 100 000 pairs of similar words:
+
+|               | Min diff (%) | Max diff (%) | Average diff (%) |
+|---------------|:------------:|:------------:|:----------------:|
+| Per Character | 75.56        | 100.00       | 93.76            |
+| Per bit       | 26.76        | 51.95        | 38.87            |
+
+- Time to hash 1.5GB size file ~**35s**
+
+Performance against other realisations (in versus mode):
+
+|      Hash name       | Time to hash 1 000 000 digests (s) | Average diff between similar word hashes (%) |
+|-------------|:----------------------------------:|:--------------------------------------------:|
+| Custom Hash | 7.58                               | 93.74                                        |
+| MD2         | 8.93                               | 93.75                                        |
+| MD5         | 0.55                               | 93.74                                        |
+| SHA-256     | 0.68                               | 93.75                                        |
+| SHA-512     | 0.59                               | 93.75                                        |
+| SHA3-256    | 1.05                               | 93.76                                        |
+
+##### Conclusion
+Quality of the hash algorithm is reasonably good in the sense that no collisions are produced while benchmarking
+and that diff score is on par with other hashing implementations. On the other hand, the algorithm is more
+than 10 times slower than industry standard realisations.
+
 Algorithm
 ---------
 
