@@ -8,7 +8,7 @@ Vilnius University, Faculty of Mathematics and Informatics, 2020 Fall
 About
 -----
 
-This application providesa  custom hash function implementation in Java, 
+This application provides a  custom hash function implementation in Java, 
 Gradle is used as a build and dependency management tool.
 
 You can run the application from a preferred IDE (Intellij IDEA, Eclipse, etc.) 
