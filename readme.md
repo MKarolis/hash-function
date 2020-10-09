@@ -65,7 +65,7 @@ $ ./HashFunction.exe -m ARG "ValueToHash"
 ```
 - Interactive mode - enter values to hash line by line
 ```
-$ ./HashFunction.exe -m i "ValueToHash"
+$ ./HashFunction.exe -m i
 Enter text and press [Enter] to hash it. Press [Ctr + C] to exit
 A
 43AE66A7DF429D367E89ED504922929740BE5A83872B2AE6D184416EB9F88C28
@@ -263,5 +263,6 @@ function formatHash() {
     FOR word OF hashWords DO
         ADD toHex(word) to output
     ENDFOR
+    RETURN output
 }
 ```
